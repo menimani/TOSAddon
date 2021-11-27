@@ -1,6 +1,7 @@
-# Extend Char info
+# Hamster
 ## *Description*
 * 自動マッチボタンをコマンドで押すことが可能
+    * ハムスターのように走り続けろ！
 * 設定フォルダ
     * Tree of Savior\addons\hamster
 
