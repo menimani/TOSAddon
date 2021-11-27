@@ -6,7 +6,7 @@ _G['ADDONS']['MENIMANI'] = _G['ADDONS']['MENIMANI'] or {}
 _G['ADDONS']['MENIMANI'][addonName] = _G['ADDONS']['MENIMANI'][addonName] or {}
 
 local g = _G['ADDONS']['MENIMANI'][addonName]
-local require('acutil')
+local acutil = require('acutil')
 
 g.settingsFileLoc = '../addons/'..addonNameLower..'/settings.json'
 g.settings = {}
@@ -73,7 +73,7 @@ function g.OpenIndun(indunType)
 
     if _G[redButtonScp] ~= nil then
         _G[redButtonScp](frame, redButton)
-        _G.ReserveScript(addonName..'_ENTER()', 1.5)
+        _G.ReserveScript(addonName..'_ENTER()', 0.5)
     end
 end
 
