@@ -42,5 +42,5 @@ function g.QuickSlot(invItem)
         _G.REQUEST_SUMMON_BOSS_TX()
         return
     end
-    return _G.BEFORE_APPLIED_NON_EQUIP_ITEM_OPEN(invItem)
+    return _G.BEFORE_APPLIED_NON_EQUIP_ITEM_OPEN_OLD(invItem)
 end
