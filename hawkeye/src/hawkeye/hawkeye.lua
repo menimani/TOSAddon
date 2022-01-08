@@ -56,15 +56,15 @@ function g.Init()
         return
     end
 
-    local frame = ui.GetFrame(addonNameLower)
+    local frame = _G.ui.GetFrame(addonNameLower)
     frame:ShowWindow(0)
 
     -- PVP地域アドオン無効
-    if IsPVPField() == 1 or IsPVPServer() == 1 then
+    if _G.IsPVPField() == 1 or _G.IsPVPServer() == 1 then
         return
     end
 
-    local map = session.GetCurrentMapProp():GetClassName()
+    local map = _G.session.GetCurrentMapProp():GetClassName()
     if g.Contains(g.settings.dismaps, map) then
         return
     end
@@ -86,15 +86,22 @@ function g.Init()
     -- ドラッグ
     frame:EnableMove(1)
     frame:EnableHitTest(1)
-    frame:SetEventScript(ui.LBUTTONUP, addonName..'_END_DRAG')
+    frame:SetEventScript(_G.ui.LBUTTONUP, addonName..'_END_DRAG')
 
     frame:Move(g.settings.position.x, g.settings.position.y)
     frame:SetOffset(g.settings.position.x, g.settings.position.y)
 
-    g.InitFrame(frame)
+    g.InitFrame()
     g.InitWindow()
 
-    ReserveScript(addonName..'_CAMERA_UPDATE()', 0.5)
+    -- Movie後に拡大比率がリセットされないようにする
+    _G.FULLBLACK_RESIZE_OLD = _G.FULLBLACK_RESIZE_OLD or _G.FULLBLACK_RESIZE
+    _G.FULLBLACK_RESIZE = function(...)
+        _G.FULLBLACK_RESIZE_OLD(...)
+        _G.ReserveScript(addonName..'_CAMERA_UPDATE()', 0.5)
+    end
+
+    _G.ReserveScript(addonName..'_CAMERA_UPDATE()', 0.5)
 end
 
 -- 引数（文字列）で渡す関数を一括で定義する
@@ -112,7 +119,7 @@ function g.GlobalFunction()
 end
 
 function g.Command(command)
-    local cmd = ''
+    local cmd
     if #command > 0 then
         cmd = table.remove(command, 1)
     else
@@ -123,21 +130,21 @@ function g.Command(command)
         local scale = tonumber(table.remove(command, 1))
         if type(scale) == 'number' then
             if scale >= g.static.min[cmd] and scale <= g.static.max[cmd] then
-                local frame = ui.GetFrame(addonNameLower)
+                local frame = _G.ui.GetFrame(addonNameLower)
                 local scr = frame:GetChild('n_scr'..cmd:upper())
-                tolua.cast(scr, 'ui::CSlideBar')
+                _G.tolua.cast(scr, 'ui::CSlideBar')
                 g.settings.campos[cmd] = scale
                 scr:SetLevel(g.settings.campos[cmd])
                 g.SaveSettings()
                 g.CameraUpdate()
             else
-                CHAT_SYSTEM('Invalid '..cmd..' level. Minimum is '..g.static.min[cmd]..' and maximum is '..g.static.max[cmd]..'.')
+                _G.CHAT_SYSTEM('Invalid '..cmd..' level. Minimum is '..g.static.min[cmd]..' and maximum is '..g.static.max[cmd]..'.')
             end
         end
         return
     end
     if cmd == 'dismap' then
-        local map = session.GetCurrentMapProp():GetClassName()
+        local map = _G.session.GetCurrentMapProp():GetClassName()
         if not g.Contains(g.settings.dismaps, map) then
             table.insert(g.settings.dismaps, map)
         end
@@ -158,13 +165,13 @@ end
 
 -- カメラ座標更新(XY軸)
 function g.CameraUpdateXY()
-    local frame = ui.GetFrame(addonNameLower)
+    local frame = _G.ui.GetFrame(addonNameLower)
     local labelX = frame:GetChild('n_labelX')
     local scrX = frame:GetChild('n_scrX')
     local labelY = frame:GetChild('n_labelY')
     local scrY = frame:GetChild('n_scrY')
-    tolua.cast(scrX, 'ui::CSlideBar')
-    tolua.cast(scrY, 'ui::CSlideBar')
+    _G.tolua.cast(scrX, 'ui::CSlideBar')
+    _G.tolua.cast(scrY, 'ui::CSlideBar')
 
     g.settings.campos.x = scrX:GetLevel()
     g.settings.campos.y = scrY:GetLevel()
@@ -172,28 +179,28 @@ function g.CameraUpdateXY()
     labelX:SetText('X座標('..(g.settings.campos.x)..'):')
     labelY:SetText('Y座標('..(g.settings.campos.y)..'):')
 
-    camera.CamRotate(g.settings.campos.y, g.settings.campos.x)
+    _G.camera.CamRotate(g.settings.campos.y, g.settings.campos.x)
     g.SaveSettings()
 end
 
 -- カメラ座標更新(Z軸)
 function g.CameraUpdateZ()
-    local frame = ui.GetFrame(addonNameLower)
+    local frame = _G.ui.GetFrame(addonNameLower)
     local labelZ = frame:GetChild('n_labelZ')
     local scrZ = frame:GetChild('n_scrZ')
-    tolua.cast(scrZ, 'ui::CSlideBar')
+    _G.tolua.cast(scrZ, 'ui::CSlideBar')
 
     g.settings.campos.z = scrZ:GetLevel()
 
     labelZ:SetText('Z座標('..(g.settings.campos.z)..'):')
 
-    camera.CustomZoom(g.settings.campos.z)
+    _G.camera.CustomZoom(g.settings.campos.z)
     g.SaveSettings()
 end
 
 -- フレーム初期化
-function g.InitFrame(frame)
-    local frame = ui.GetFrame(addonNameLower)
+function g.InitFrame()
+    local frame = _G.ui.GetFrame(addonNameLower)
     frame:SetSkinName('box_glass')
 
     local titleText = frame:CreateOrGetControl('richtext', 'n_titleText', 0, 0, 0, 0)
@@ -201,13 +208,13 @@ function g.InitFrame(frame)
     titleText:SetFontName('white_16_ol')
     titleText:SetText('/hawkeye or /hawk')
 
-    local btnReset = frame:CreateOrGetControl('button', 'n_resize', 236, 4, 30, 30)
-    btnReset:SetText('{@sti7}{s16}W')
-    btnReset:SetEventScript(ui.LBUTTONUP, addonName..'_RESIZE_WINDOW')
+    local btnResetWindow = frame:CreateOrGetControl('button', 'n_resize', 236, 4, 30, 30)
+    btnResetWindow:SetText('{@sti7}{s16}W')
+    btnResetWindow:SetEventScript(_G.ui.LBUTTONUP, addonName..'_RESIZE_WINDOW')
 
     local btnReset = frame:CreateOrGetControl('button', 'n_reset', 266, 4, 30, 30)
     btnReset:SetText('{@sti7}{s16}R')
-    btnReset:SetEventScript(ui.LBUTTONUP, addonName..'_RESET')
+    btnReset:SetEventScript(_G.ui.LBUTTONUP, addonName..'_RESET')
 
     local labelX = frame:CreateOrGetControl('richtext', 'n_labelX', 0, 0, 0, 0)
     labelX:SetOffset(20,40)
@@ -225,19 +232,19 @@ function g.InitFrame(frame)
     labelZ:SetText('Z座標('..(g.settings.campos.z)..'):')
 
     local scrX = frame:CreateOrGetControl('slidebar', 'n_scrX', 120, 34, 180, 30)
-    tolua.cast(scrX, 'ui::CSlideBar')
+    _G.tolua.cast(scrX, 'ui::CSlideBar')
     scrX:SetMinSlideLevel(g.static.min.x)
     scrX:SetMaxSlideLevel(g.static.max.x-1)
     scrX:SetLevel(g.settings.campos.x)
 
     local scrY = frame:CreateOrGetControl('slidebar', 'n_scrY', 120, 64, 180, 30)
-    tolua.cast(scrY, 'ui::CSlideBar')
+    _G.tolua.cast(scrY, 'ui::CSlideBar')
     scrY:SetMinSlideLevel(g.static.min.y)
     scrY:SetMaxSlideLevel(g.static.max.y-1)
     scrY:SetLevel(g.settings.campos.y)
 
     local scrZ = frame:CreateOrGetControl('slidebar', 'n_scrZ', 120, 94, 180, 30)
-    tolua.cast(scrZ, 'ui::CSlideBar')
+    _G.tolua.cast(scrZ, 'ui::CSlideBar')
     scrZ:SetMinSlideLevel(g.static.min.z)
     scrZ:SetMaxSlideLevel(g.static.max.z)
     scrZ:SetLevel(g.settings.campos.z)
@@ -245,13 +252,13 @@ end
 
 -- カメラ座標リセット
 function g.Reset()
-    local frame = ui.GetFrame(addonNameLower)
+    local frame = _G.ui.GetFrame(addonNameLower)
     local scrX = frame:GetChild('n_scrX')
     local scrY = frame:GetChild('n_scrY')
     local scrZ = frame:GetChild('n_scrZ')
-    tolua.cast(scrX, 'ui::CSlideBar')
-    tolua.cast(scrY, 'ui::CSlideBar')
-    tolua.cast(scrZ, 'ui::CSlideBar')
+    _G.tolua.cast(scrX, 'ui::CSlideBar')
+    _G.tolua.cast(scrY, 'ui::CSlideBar')
+    _G.tolua.cast(scrZ, 'ui::CSlideBar')
 
     g.settings.campos.x = g.static.default.x
     g.settings.campos.y = g.static.default.y
@@ -265,7 +272,7 @@ end
 
 -- ウィンドウサイズ初期化
 function g.InitWindow()
-    local frame = ui.GetFrame(addonNameLower)
+    local frame = _G.ui.GetFrame(addonNameLower)
     if g.settings.window == 1 then
         frame:Resize(300,40)
     else
@@ -275,7 +282,7 @@ end
 
 -- ウィンドウサイズ変更(Wボタン押下用)
 function g.ResizeWindow()
-    local frame = ui.GetFrame(addonNameLower)
+    local frame = _G.ui.GetFrame(addonNameLower)
     if g.settings.window == 0 then
         g.settings.window = 1
         frame:Resize(300,40)
@@ -288,7 +295,7 @@ end
 
 -- フレーム場所保存処理
 function g.EndDrag()
-    local frame = ui.GetFrame(addonNameLower)
+    local frame = _G.ui.GetFrame(addonNameLower)
     g.settings.position.x = frame:GetX()
     g.settings.position.y = frame:GetY()
     g.SaveSettings()
@@ -296,7 +303,7 @@ end
 
 -- フレームの表示切り替え
 function g.ToggleFrame()
-    local frame = ui.GetFrame(addonNameLower)
+    local frame = _G.ui.GetFrame(addonNameLower)
     if g.settings.enable == true then
         frame:ShowWindow(0)
         g.settings.enable = false
