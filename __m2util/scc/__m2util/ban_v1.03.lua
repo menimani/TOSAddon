@@ -1,4 +1,4 @@
-local currentVersion = 1.02
+local currentVersion = 1.03
 
 _G['ADDONS'] = _G['ADDONS'] or {}
 _G['ADDONS']['MENIMANI'] = _G['ADDONS']['MENIMANI'] or {}
@@ -23,6 +23,9 @@ if g.loadedVersion < currentVersion then
         ['76561198843189363'] = true, -- あざらしはうす
         ['76561198294814767'] = true, -- おかちゃんず
         ['76561198372617664'] = true, -- ラリア
+        ['76561199006065458'] = true, -- NoLife(旧：Patas)
+        ['76561199231327410'] = true, -- NoLifeサブ(YesLife)
+        ['76561198888201990'] = true, -- NoLifeサブ(のららいふ)
     }
     g.banGuild = banGuild
     g.banUser = banUser
