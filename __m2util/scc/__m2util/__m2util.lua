@@ -199,20 +199,15 @@ end
 
     ■呼出方法
     local g = _G['ADDONS']['MENIMANI'][addonName]
-    g:ReserveScript(funcTbl, sec)
+    g:ReserveScript(func, args, sec)
 
     ■引数
-    funcTbl 遅延対象の関数情報配列
-        [
-            関数,
-            ...引数
-        ]
-    sec     何秒後に実行するか
+    func 遅延対象の関数
+    args 引数　{ 数値引数, "'文字列引数'" }
+    sec  何秒後に実行するか
 --]]
-function M2UTIL.ReserveScript(self, funcTbl, sec)
-    local func = table.remove(funcTbl, 1)
-    local args = table.concat(funcTbl)
-    _G.ReserveScript(self.GFunc(func)..'('..args..')', sec)
+function M2UTIL.ReserveScript(self, func, args, sec)
+    _G.ReserveScript(self:GFunc(func)..'('..table.concat(args, ',')..')', sec)
 end
 
 --[[
