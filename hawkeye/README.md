@@ -3,6 +3,7 @@
 * Camconを魔改造したアドオン
 * 設定フォルダ
     * Tree of Savior\addons\hawkeye
+* 動作には別途「__m2util」が必要
 
 ## *Commands*
 * `/hawkeye` or `/hawk` : 

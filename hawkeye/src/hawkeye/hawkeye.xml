@@ -2,14 +2,10 @@
 <uiframe name="hawkeye" x="0" y="0" width="0" height="0" create="open">
 	<frame snapclient="true" snapframe="true" layout_gravity="light top" margin="0 0 0 0"/>
 	<option visible="true" alwaysVisible="false" closebutton="false" useimageitem="true" autoopen="true" hideable="true"/>
-	<input hittest="true" movable="true" moveintitlebar="false" hittestframe="true"/>
+	<input hittest="true" movable="true" moveintitlebar="true" hittestframe="true"/>
 	<layer layerlevel="60"/>
 	<draw drawnotitlebar="false" drawtitlebar="false" drawframe="true"/>
 	<skin name="listbox"/>
 	<sound opensound="win_open" closesound="win_close"/>
-	<controls>
-		<slidebar name="n_scrX" rect="120 34 180 30" margin="0 0 0 0" layout_gravity="left top" SlideScp="HAWKEYE_CAMERA_UPDATE_XY()"/>
-		<slidebar name="n_scrY" rect="120 64 180 30" margin="0 0 0 0" layout_gravity="left top" SlideScp="HAWKEYE_CAMERA_UPDATE_XY()"/>
-		<slidebar name="n_scrZ" rect="120 94 180 30" margin="0 0 0 0" layout_gravity="left top" SlideScp="HAWKEYE_CAMERA_UPDATE_Z()"/>
-	</controls>
+    <controls/>
 </uiframe>
