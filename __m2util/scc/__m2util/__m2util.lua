@@ -146,7 +146,7 @@ end
 function M2UTIL.GFunc(self, func)
     local globalFuncName = tostring(func):gsub('function: ', self.addonName)
     table.insert(globalFuncList, globalFuncName)
-    _G[globalFuncName] = _G[globalFuncName] or func
+    _G[globalFuncName] = func
     return globalFuncName
 end
 
@@ -176,6 +176,76 @@ end
     インスタンス関数
 
     ■処理内容
+    関数実行後にイベント発火
+
+    ■呼出方法
+    local g = _G['ADDONS']['MENIMANI'][addonName]
+    g:setupEvent(eventName, func)
+
+    ■引数
+    eventName 元関数名
+    func      イベントに紐づける関数
+--]]
+function M2UTIL.setupEvent(self, eventName, func)
+    self:setupHook(eventName, function(...)
+        local result = self.oldFunc[eventName](...)
+        _G.imcAddOn.BroadMsg(eventName)
+        return result
+    end)
+    self:RegisterMsg(eventName, func)
+end
+
+--[[
+    ■属性
+    インスタンス関数
+
+    ■処理内容
+    イベント登録
+
+    ■呼出方法
+    local g = _G['ADDONS']['MENIMANI'][addonName]
+    g:RegisterMsg(eventName, func)
+
+    ■引数
+    eventName イベント名
+    func      イベントに紐づける関数
+--]]
+function M2UTIL.RegisterMsg(self, eventName, func)
+    local funcName = self:GFunc(func)
+    local eventFuncName = eventName .. '_' .. funcName
+    table.insert(globalFuncList, eventFuncName)
+    _G[eventFuncName] = _G[funcName]
+    self.addon:RegisterMsg(eventName, eventFuncName)
+end
+
+--[[
+    ■属性
+    インスタンス関数
+
+    ■処理内容
+    イベント解除　※登録時の関数
+
+    ■呼出方法
+    local g = _G['ADDONS']['MENIMANI'][addonName]
+    g:UnRegisterMsg(eventName, func)
+
+    ■引数
+    eventName イベント名
+    func      イベントに紐づけたときの関数（関数のIDが変わってはならない）
+--]]
+function M2UTIL.UnRegisterMsg(self, eventName, func)
+    local funcName = self:GFunc(func)
+    local eventFuncName = eventName .. '_' .. funcName
+    table.insert(globalFuncList, eventFuncName)
+    _G[eventFuncName] = function () end
+    self.addon:RegisterMsg(eventName, eventFuncName)
+end
+
+--[[
+    ■属性
+    インスタンス関数
+
+    ■処理内容
     スラッシュコマンド登録
 
     ■呼出方法
@@ -195,6 +265,25 @@ end
     インスタンス関数
 
     ■処理内容
+    関数実行文字列可
+
+    ■呼出方法
+    local g = _G['ADDONS']['MENIMANI'][addonName]
+    g:FuncFormat(func, args)
+
+    ■引数
+    func 関数
+    args 引数　{ 数値引数, "'文字列引数'" }
+--]]
+function M2UTIL.FuncFormat(self, func, args)
+    return string.format('%s(%s)', self:GFunc(func), table.concat(args, ','))
+end
+
+--[[
+    ■属性
+    インスタンス関数
+
+    ■処理内容
     遅延実行
 
     ■呼出方法
@@ -207,7 +296,7 @@ end
     sec  何秒後に実行するか
 --]]
 function M2UTIL.ReserveScript(self, func, args, sec)
-    _G.ReserveScript(self:GFunc(func)..'('..table.concat(args, ',')..')', sec)
+    _G.ReserveScript(self:FuncFormat(func, args), sec)
 end
 
 --[[
