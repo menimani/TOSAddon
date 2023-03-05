@@ -8,3 +8,4 @@
     * hamster
     * hawkeye
     * inputpass
+    * showtargetbuff

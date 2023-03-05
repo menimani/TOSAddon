@@ -22,6 +22,7 @@
     * 低スペックモード
         * 描画タイミングを減らすことでバフが頻繁に付与され処理が遅くなることを防ぎます
 * addons フォルダ内に showtargetbuff フォルダを作成してください
+* 動作には別途「__m2util」が必要
 
 ## *Commands*
 * `/showtargetbuff` :
