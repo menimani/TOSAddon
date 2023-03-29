@@ -5,6 +5,7 @@
     * adjustlayer
     * bossmsginsec
     * bountymount
+    * chaser
     * easysearch
     * fastread
     * fkfunc

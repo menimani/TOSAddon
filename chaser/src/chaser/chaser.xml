@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uiframe name="chaser" x="0" y="0" width="360" height="265">
+    <frame
+        layout_gravity="center top"
+        margin="350 36 0 0"
+    />
+    <skin
+        frameskin="chat_window"
+    />
+    <option
+        visible="false"
+        alwaysVisible="false"
+        hideable="false"
+        closebutton="false"
+    />
+    <layer
+        layerlevel="60"
+    />
+    <input
+        moveable="true"
+        moveintitlebar="false"
+        hittestframe="true"
+    />
+    <draw
+        drawtitlebar="false"
+        drawnotitlebar="false"
+    />
+    <userconfig
+        frame_width="350"
+        frame_height="265"
+        gbox_detail_width="344"
+        gbox_detail_height="135"
+        gbox_timer_width="344"
+        gbox_timer_height="80"
+    />
+    <controls>
+        <groupbox
+            name="gbox"
+            rect="0 0 350 265"
+            hittest="true"
+            margin="0 0 0 0"
+            layout_gravity="center center"
+            draw="true"
+            fixheight="false"
+            scrollbar="false"
+            resizebyparent="false"
+            resizebyresolution="false"
+            skin="chat_window"
+        />
+        <groupbox
+            name="gbox_title"
+            rect="0 0 344 37"
+            hittest="true"
+            margin="0 4 0 0"
+            layout_gravity="center top"
+            parent="gbox"
+            draw="true"
+            fixheight="false"
+            scrollbar="false"
+            resizebyparent="false"
+            resizebyresolution="false"
+            skin="white_box_op10"
+        />
+        <groupbox
+            name="gbox_detail"
+            rect="0 0 344 135"
+            hittest="true"
+            margin="0 43 0 0"
+            layout_gravity="center top"
+            parent="gbox"
+            draw="true"
+            fixheight="false"
+            scrollbar="false"
+            resizebyparent="true"
+            resizebyresolution="true"
+            skin="black_box_op20"
+        />
+        <groupbox
+            name="gbox_timer"
+            rect="0 0 344 80"
+            hittest="true"
+            margin="0 0 0 4"
+            layout_gravity="center bottom"
+            parent="gbox"
+            draw="true"
+            fixheight="false"
+            scrollbar="false"
+            resizebyparent="false"
+            resizebyresolution="false"
+            skin="white_box_op10"
+        />
+        <richtext
+            name="text_title"
+            rect="0 0 100 30"
+            margin="0 0 0 0"
+            layout_gravity="center center"
+            parent="gbox_title"
+            textalign="center center"
+            format="{@st43}{s16}%s"
+            param1="title"
+            param1_def="追従者出現！"
+        />
+        <button
+            name="btn_close"
+            rect="0 0 26 25"
+            margin="0 0 6 0"
+            parent="gbox_title"
+            texttooltip="閉じる"
+            layout_gravity="right center"
+            MouseOffAnim="btn_mouseoff"
+            MouseOnAnim="btn_mouseover"
+            clicksound="button_click_big"
+            oversound="button_over"
+            image="button_close_mini"
+        />
+        <richtext
+            name="text_counter"
+            rect="0 0 340 25"
+            parent="gbox_timer"
+            margin="0 10 0 0"
+            layout_gravity="center top"
+            format="{@st43}{s16}[%s](%s)"
+            param1="text"
+            param2="count"
+            param2_def="0"
+            hittest="true"
+        />
+        <richtext
+            name="text_timer"
+            rect="0 0 340 30"
+            margin="0 40 0 0"
+            parent="gbox_timer"
+            layout_gravity="center top"
+            format="{img test_cooltime 20 20}{@st43}{s16}Token Warp CD - %s"
+            param1="time"
+            param1_def="00:00"
+        />
+        <gauge
+            name="gauge_timer"
+            rect="0 0 314 8"
+            margin="0 0 0 6"
+            parent="gbox_timer"
+            layout_gravity="center bottom"
+            drawlastpoint="false"
+            ratewidth="true"
+            skin="gauge_sudden_quest"
+            textalign1="center center"
+            textalign2="left center"
+            textfont1="mygauge"
+            textfont2="mygauge"
+            textoffset1="0 4"
+            textoffset2="4 4"
+            hittest="true"
+        />
+    </controls>
+</uiframe>
