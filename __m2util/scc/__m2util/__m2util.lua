@@ -65,8 +65,10 @@ M2UTIL.OnInit = function(addonName, onInitFunc)
 
     _G[addonName..'_START'] = function()
         if _G.ADDONS.MENIMANI.BAN.isBan() then
+            _G.CHAT_SYSTEM('['..g.addonNameLower..'] you pissed me off')
             return
         end
+        _G.CHAT_SYSTEM('['..g.addonNameLower..'] is loaded')
         onInitFunc(g.addon, g.frame)
     end
 
@@ -325,6 +327,67 @@ function M2UTIL.Contains(_, arr, word)
         end
     end
     return false
+end
+
+--[[
+    LOG関連処理
+    各アドオンデフォルトではログ出力なし
+    ログレベルは下記のように設定変更
+    _G.ADDONS.MENIMANI.ADDONNAME.loglevel = 'debug'
+    _G.ADDONS.MENIMANI.ADDONNAME.loglevel = 'info'
+    _G.ADDONS.MENIMANI.ADDONNAME.loglevel = 'warn'
+    _G.ADDONS.MENIMANI.ADDONNAME.loglevel = 'error'
+]]
+M2UTIL.loglevel = 'none'
+
+local function log(color, text)
+    print(color..tostring(text):gsub('^\t+', ''):gsub('\n\t+$', ''):gsub('(\n)\t+', '%1'))
+end
+
+function M2UTIL.debug(self, text)
+    local LogTarget = {
+        'debug'
+    }
+    if M2UTIL:Contains(LogTarget, self.loglevel) == false then
+        return
+    end
+    log('{#696969}', '['..self.addonNameLower..'] '..text)
+end
+
+function M2UTIL.info(self, text)
+    local LogTarget = {
+        'debug',
+        'info'
+    }
+    if M2UTIL:Contains(LogTarget, self.loglevel) == false then
+        return
+    end
+    log('{#ffffff}', '['..self.addonNameLower..'] '..text)
+end
+
+function M2UTIL.warn(self, text)
+    local LogTarget = {
+        'debug',
+        'info',
+        'warn'
+    }
+    if M2UTIL:Contains(LogTarget, self.loglevel) == false then
+        return
+    end
+    log('{#cfe600}', '['..self.addonNameLower..'] '..text)
+end
+
+function M2UTIL.error(self, text)
+    local LogTarget = {
+        'debug',
+        'info',
+        'warn',
+        'error'
+    }
+    if M2UTIL:Contains(LogTarget, self.loglevel) == false then
+        return
+    end
+    log('{#cc0000}', '['..self.addonNameLower..'] '..text)
 end
 
 --[[
