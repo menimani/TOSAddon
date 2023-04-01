@@ -29,6 +29,17 @@ g.settings = {
     message = '%s %dch %s(Lv%d)を発見'
 }
 
+g.target = {
+    _G.GetClassByType('Monster', '210000').Name, -- 追従者ジャガー
+    _G.GetClassByType('Monster', '210001').Name, -- 堕落したレティアリィ
+    _G.GetClassByType('Monster', '210002').Name, -- 追従者ケラウノス
+    _G.GetClassByType('Monster', '210004').Name, -- 追従者カタフラクト
+    _G.GetClassByType('Monster', '210005').Name, -- 追従者アバリスター
+    _G.GetClassByType('Monster', '210006').Name, -- 追従者インクイジター
+    _G.GetClassByType('Monster', '210007').Name, -- 追従者ジーロット
+    _G.GetClassByType('Monster', '210008').Name, -- 追従者ムルミロ
+}
+
 _G['ADDONS']['MENIMANI']['M2UTIL'].OnInit(addonName, function()
     local frame = _G.ui.GetFrame(g.addonNameLower)
     local btn_close = _G.GET_CHILD_RECURSIVELY(frame, 'btn_close')
@@ -38,6 +49,12 @@ _G['ADDONS']['MENIMANI']['M2UTIL'].OnInit(addonName, function()
 
     g.CountUpdate()
     g.WarpMapUpdate()
+
+    if g.survival <= 0 then
+        -- 討伐完了時リセット
+        -- 　※討伐ログ後も残像が残っているので、討伐後のロード時にリセット
+        g.spotted = {} -- 発見済追従者
+    end
 
     g:RegisterMsg('NOTICE_Dm_Global_Shout', g.NoticeDmGlobalShout)
     g:RegisterMsg('FPS_UPDATE', g.TokenWarpCdUpdate)
@@ -126,10 +143,10 @@ function g.CountUpdate()
     local frame = _G.ui.GetFrame(g.addonNameLower)
     local text_counter = _G.GET_CHILD_RECURSIVELY(frame, 'text_counter')
     text_counter:SetTextByKey('text', '討伐状況')
-    g.remaining = g.popped - g.killed
+    g.survival = g.popped - g.killed
     text_counter:SetTextByKey('count', g.killed..'/'..g.popped)
 
-    if g.remaining <= 0 then
+    if g.survival <= 0 then
         -- 討伐完了時リセット
         frame:ShowWindow(0)
         g.popped = 0 -- 出現数
@@ -185,40 +202,50 @@ function g.Command(command)
     _G.CHAT_SYSTEM('[Chaser] Invalid Command')
 end
 
--- 一定時間間隔で実行する
 function g.SpotterLoop()
-    local FoundList, FoundCount = _G.SelectBaseObject(_G.GetMyPCObject(), 700, 'ENEMY')
-    for i = 1 , FoundCount do
-        local FoundItem = FoundList[i]
-        local actor = _G.tolua.cast(FoundItem, 'CFSMActor')
-        if actor:GetObjType() == _G.GT_MONSTER then
-            local monCls = _G.GetClassByType('Monster', actor:GetType())
-            local monName = _G.dictionary.ReplaceDicIDInCompStr(monCls.Name)
-            if string.find(monName, '追従者') then
-                local handle = actor:GetHandleVal()
-                if g.spotted[tostring(handle)] ~= true then
-                    g.spotted[tostring(handle)] = true
-                    g.SpotterChat(actor)
+    local list, count = _G.SelectObject(_G.GetMyPCObject(), 700, 'ALL')
+    for i = 1, count do
+        local handle = _G.GetHandle(list[i])
+        if handle ~= nil and _G.info.IsPC(handle) == 1 then
+            local familyName = _G.info.GetFamilyName(handle)
+            if g.IsTarget(familyName) then
+                local map = _G.session.GetMapName()
+                local ch = _G.session.loginInfo.GetChannel() + 1
+                -- 固まって出現するため、マップ＋チャンネル毎に１回のチャット出力とする
+                if g.spotted['map'..map..'_ch'..ch] == nil then
+                    g.spotted['map'..map..'_ch'..ch] = true
+                    g.SpotterChat(handle)
                 end
             end
         end
     end
 end
 
-function g.SpotterChat(actor)
-    local monCls = _G.GetClassByType('Monster', actor:GetType())
-    local channel = _G.session.loginInfo.GetChannel()
-    local actorPos = actor:GetPos()
-    local level = actor:GetLv()
-    local place = _G.MAKE_LINK_MAP_TEXT(_G.session.GetMapName(), actorPos.x, actorPos.z)
-    local message = g.settings.message
+function g.IsTarget(familyName)
+    return g:Contains(g.target, familyName)
+end
 
+function g.SpotterChat(handle)
+    local link = g.CreateLinkText(handle)
+    local channel = _G.session.loginInfo.GetChannel() + 1
+    local name = '追従者モンスター'
+    local level = _G.info.GetLevel(handle)
+
+    local msg = string.format(g.settings.message, link, channel, name, level)
     for _, type in pairs(g.settings.type) do
         if type.enable then
-            local chat = string.format(type.command..message, place, channel+1, monCls.Name, level)
-            _G.ui.Chat(chat)
+            _G.ui.Chat(type.command..msg)
         end
     end
+end
+
+function g.CreateLinkText(handle)
+    local actor = _G.world.GetActor(handle)
+    local pos = actor:GetPos()
+
+    local prop = _G.session.GetCurrentMapProp()
+    local name = prop:GetName()
+    return string.format('{a SLM %d#%d#%d}{#0000FF}{img link_map 24 24}%s[%d,%d]{/}{/}{/}', prop.type, pos.x, pos.z, name, pos.x, pos.z)
 end
 
 --[[
