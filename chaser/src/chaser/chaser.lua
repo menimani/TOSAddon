@@ -149,10 +149,7 @@ function g.CountUpdate()
     if g.survival <= 0 then
         -- 討伐完了時リセット
         frame:ShowWindow(0)
-        g.popped = 0 -- 出現数
-        g.killed = 0 -- 討伐数
-        g.survival = 0 -- 生存数
-        g.map = {} -- 出現場所
+        g.Reset()
     else
         -- 討伐中はウィンドウ表示
         frame:ShowWindow(1)
@@ -161,6 +158,14 @@ end
 
 function g.CloseFrame()
     _G.ui.GetFrame(g.addonNameLower):ShowWindow(0)
+    g.Reset()
+end
+
+function g.Reset()
+    g.popped = 0 -- 出現数
+    g.killed = 0 -- 討伐数
+    g.survival = 0 -- 生存数
+    g.map = {} -- 出現場所
 end
 
 function g.GetSystemTime()
