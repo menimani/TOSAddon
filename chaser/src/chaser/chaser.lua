@@ -98,11 +98,11 @@ function g.WarpMapUpdate()
         local mapCls = _G.GetClassByStrProp('Map', 'Name', v)
 
         local offset = {
-            x = 20,
-            y = 45 * index + 6
+            x = 10,
+            y = 22 * index + 3
         }
 
-        local icon = gbox_detail:CreateOrGetControl('picture', 'icon_' .. index, offset.x, offset.y, 30, 30)
+        local icon = gbox_detail:CreateOrGetControl('picture', 'icon_' .. index, offset.x, offset.y, 15, 15)
         _G.tolua.cast(icon, 'ui::CPicture')
         icon:SetImage('questinfo_return')
         icon:SetEventScript(_G.ui.LBUTTONUP, g:GFunc(g.TokenWarp))
@@ -174,7 +174,24 @@ function g.GetSystemTime()
 end
 
 function g.GetMapDicName(msgAppearPCMonster)
-    return msgAppearPCMonster:match('%$name$%*$(.-)#@!')
+    local dicId = msgAppearPCMonster:match('%$name$%*$(.-)#@!')
+    local dicKr = dicId:match("#(.-)#")
+    -- Ｗ鯖統合により、仕様変更され、韓国語名のタグで送られてくることがある。
+    if dicKr == nil then
+        -- 韓国語ではない。従来のdicID
+        return dicId
+    end
+
+    -- 突き合わせることで、韓国語名のタグからdicIDに変換。
+    local plainNameTransrated = _G.dic.getTranslatedStr(dicKr)
+    local clsList, size = _G.GetClassList('Map')
+    for i = 0, size - 1 do
+        local cls = _G.GetClassByIndexFromList(clsList, i)
+        local plainName = _G.dictionary.ReplaceDicIDInCompStr(cls.Name)
+        if plainName == plainNameTransrated then
+            return cls.Name
+        end
+    end
 end
 
 function g.TokenWarp(_, _, className, _)
@@ -299,4 +316,40 @@ function g.TestStop2Map()
     g.TestMsgDisappear('name06')
     g.TestMsgDisappear('name07')
     g.TestMsgDisappear('name08')
+end
+
+function g.TestStart6KrMap()
+    g.TestMsgAppear('|$#나하스 숲#$|')
+    g.TestMsgAppear('|$#펠라인 포스트 타운#$|')
+    g.TestMsgAppear('|$#엘고스 수도원 별관#$|')
+    g.TestMsgAppear('|$#유데이안 숲#$|')
+    g.TestMsgAppear('|$#칼레이마스 접견소#$|')
+    g.TestMsgAppear('|$#칼레이마스 접견소#$|')
+end
+
+function g.TestStop6KrMap()
+    g.TestMsgDisappear('name01')
+    g.TestMsgDisappear('name02')
+    g.TestMsgDisappear('name03')
+    g.TestMsgDisappear('name04')
+    g.TestMsgDisappear('name05')
+    g.TestMsgDisappear('name06')
+    g.TestMsgDisappear('name07')
+    g.TestMsgDisappear('name08')
+    g.TestMsgDisappear('name09')
+    g.TestMsgDisappear('name10')
+    g.TestMsgDisappear('name11')
+    g.TestMsgDisappear('name12')
+    g.TestMsgDisappear('name13')
+    g.TestMsgDisappear('name14')
+    g.TestMsgDisappear('name15')
+    g.TestMsgDisappear('name16')
+    g.TestMsgDisappear('name17')
+    g.TestMsgDisappear('name18')
+    g.TestMsgDisappear('name19')
+    g.TestMsgDisappear('name20')
+    g.TestMsgDisappear('name21')
+    g.TestMsgDisappear('name22')
+    g.TestMsgDisappear('name23')
+    g.TestMsgDisappear('name24')
 end
