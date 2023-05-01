@@ -5,6 +5,7 @@
     * adjustlayer
     * bossmsginsec
     * bountymount
+    * cardchanger
     * chaser
     * easysearch
     * fastread
