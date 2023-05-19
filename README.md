@@ -8,6 +8,7 @@
     * cardchanger
     * chaser
     * easysearch
+    * extendcharinfo
     * fastread
     * fkfunc
     * hamster
