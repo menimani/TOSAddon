@@ -6,46 +6,43 @@ _G['ADDONS']['MENIMANI'][addonName] = _G['ADDONS']['MENIMANI'][addonName] or {}
 local g = _G['ADDONS']['MENIMANI'][addonName]
 
 _G['ADDONS']['MENIMANI']['M2UTIL'].OnInit(addonName, function()
-    -- addon.ipf\warningmsgbox\warningmsgbox.lua
-    g:setupEvent('WARNINGMSGBOX_FRAME_OPEN', g.AutoInput)
-    g:setupEvent('NOT_ROASTING_GEM_EQUIP_WARNINGMSGBOX_FRAME_OPEN', g.AutoInput)
-    g:setupEvent('WARNINGMSGBOX_FRAME_OPEN_REBUILDPOPUP', g.AutoInput)
-    g:setupEvent('WARNINGMSGBOX_FRAME_OPEN_NONNESTED', g.AutoInput)
-    g:setupEvent('WARNINGMSGBOX_FRAME_OPEN_WITH_CHECK', g.AutoInput)
-    g:setupEvent('WARNINGMSGBOX_FRAME_OPEN_DELETE_ITEM', g.AutoInput)
-    g:setupEvent('WARNINGMSGBOX_FRAME_OPEN_EXCHANGE_RECYCLE', g.AutoInput)
-    -- addon.ipf\warningmsgbox_ex\warningmsgbox_ex.lua
-    g:setupEvent('WARNINGMSGBOX_EX_FRAME_OPEN', g.AutoInputEx)
-    g:setupEvent('WARNINGMSGBOX_EX_REINFORCE_OPEN', g.AutoInputEx)
-    g:setupEvent('WARNINGMSGBOX_EX_TRANSCEND_OPEN', g.AutoInputEx)
-    g:setupEvent('WARNINGMSGBOX_EX_ENGRAVE_OPEN', g.AutoInputEx)
+    g:RegisterMsg('FPS_UPDATE', g.AutoInputUpdate)
 end)
 
-function g.AutoInput()
-    -- 指定文字列を抽出し、自動入力する
-    local frame = _G.ui.GetFrame('warningmsgbox')
-    local warningText = _G.GET_CHILD_RECURSIVELY(frame, 'warningtext')
-    local input_text = string.match(warningText:GetText(), '.+%[(%S+)%]')
-    if input_text == nil then
-        return
-    end
-    local input_frame = _G.GET_CHILD_RECURSIVELY(frame, 'input')
-    if input_frame == nil then
-        return
-    end
-    input_frame:SetText(input_text)
-end
+function g.AutoInputUpdate()
+    local frame = (function ()
+        if _G.ui.GetFrame('warningmsgbox'):IsVisible() == 1 then
+            return _G.ui.GetFrame('warningmsgbox')
+        end
 
-function g.AutoInputEx()
-    -- 指定文字列を抽出し、自動入力する
-    local frame = _G.ui.GetFrame('warningmsgbox_ex')
-    local warningText = _G.GET_CHILD_RECURSIVELY(frame, 'warningtext')
-    local input_text = string.match(warningText:GetText(), '.+%[(%S+)%]')
-    if input_text == nil then
+        if _G.ui.GetFrame('warningmsgbox_ex'):IsVisible() == 1 then
+            return _G.ui.GetFrame('warningmsgbox_ex')
+        end
+    end)()
+
+    if frame == nil then
         return
     end
+
     local input_frame = _G.GET_CHILD_RECURSIVELY(frame, 'input')
     if input_frame == nil then
+        return
+    end
+
+    local text = (function ()
+        local comparetext = _G.GET_CHILD_RECURSIVELY(frame, 'comparetext')
+        if comparetext ~= nil then
+            return comparetext:GetText()
+        end
+
+        local warningtext = _G.GET_CHILD_RECURSIVELY(frame, 'warningtext')
+        if warningtext ~= nil then
+            return warningtext:GetText()
+        end
+    end)()
+
+    local input_text = string.match(text, '.+%[(%S+)%]')
+    if input_text == nil then
         return
     end
     input_frame:SetText(input_text)
