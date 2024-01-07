@@ -15,3 +15,4 @@
     * hawkeye
     * inputpass
     * showtargetbuff
+    * translator

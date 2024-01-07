@@ -1,0 +1,5 @@
+{
+    "api_url": "https://api-free.deepl.com/v2/translate",
+    "api_key": "<API_KEY>",
+    "watch_dir": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Tree of Savior (Japanese Ver.)\\addons\\translator\\watch"
+}
