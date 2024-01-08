@@ -7,7 +7,7 @@ local g = _G['ADDONS']['MENIMANI'][addonName]
 local acutil = require('acutil')
 
 print('translator')
---dofile('C:/Users/achto/Documents/GitHub/TOSAddon_Private/translator/src/translator/translator.lua'); _G['ADDONS']['MENIMANI']['TRANSLATOR']:LoadSettings()
+--dofile('C:/Users/achto/Documents/GitHub/TOSAddon/translator/src/translator/translator.lua'); _G['ADDONS']['MENIMANI']['TRANSLATOR']:LoadSettings()
 g.settings = {
     transrate = {
         normal = true,
@@ -142,18 +142,17 @@ function acutil.onUIChat(msg)
     end
 
     local chatType = table.remove(words, 1)
-
     local target
-    if g:Contains({'/w', '/f'}, chatType) then
-        target = table.remove(words, 1)
-    end
-
     local cmd
-    if g:Contains({'/s', '/y', '/p', '/g', '/gn','/w', '/f'}, chatType) then
+    if g:Contains({'/s', '/y', '/p', '/g', '/gn'}, chatType) then
         cmd = table.remove(words, 1)
-    elseif acutil.slashCommands[chatType] ~= nil then
+    elseif g:Contains({'/w', '/f'}, chatType) then
+        target = table.remove(words, 1)
+        cmd = table.remove(words, 1)
+    else
         -- 一般チャットの場合、チャットタイプが付与されない
         cmd = chatType
+        chatType = nil
     end
 
     if cmd == '/trans' then
@@ -169,7 +168,13 @@ function acutil.onUIChat(msg)
         return
     end
 
-    acutil.uiChat_OLD(msg)
+    if chatType ~= nil and string.sub(cmd, 1, 1) == '/' then
+        -- スラッシュコマンドは一般チャットとして実行する
+        -- ※ささやき、グルチャの誤判定対応
+        acutil.uiChat_OLD(cmd .. table.concat(words, ' '))
+    else
+        acutil.uiChat_OLD(msg)
+    end
 
     local fn = acutil.slashCommands[cmd]
     if (fn ~= nil) then
